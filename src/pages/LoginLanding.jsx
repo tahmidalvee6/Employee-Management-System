@@ -1,4 +1,4 @@
-import LoginLeftSide from "../components/LoginLeftside"
+import LoginLeftSide from "../components/LoginLeftSide"
 import { ArrowRightIcon, ShieldIcon, UserIcon } from "lucide-react"
 import { Link } from "react-router-dom"
 const LoginLanding = () => {
