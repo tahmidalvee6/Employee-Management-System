@@ -2,8 +2,11 @@ import React, { useState }from 'react'
 import { Loader2, Plus } from 'lucide-react'
 import { X } from 'lucide-react'
 import { dummyEmployeeData } from '../../assets/assets'
+<<<<<<< HEAD
 import api from '../../api/axios'
 import toast from 'react-hot-toast'
+=======
+>>>>>>> ca03ae14e9570d22225491143a38c5ac58307437
 
 const GeneratePayslipForm = () => {
 
@@ -19,6 +22,7 @@ const GeneratePayslipForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+<<<<<<< HEAD
         setLoading(true)
         const formData = new FormData(e.currentTarget);
         const data = Object.fromEntries(formData.entries())
@@ -30,6 +34,8 @@ const GeneratePayslipForm = () => {
             toast.error(err.response?.data?.error || err?.message);
         }
         setLoading(false)
+=======
+>>>>>>> ca03ae14e9570d22225491143a38c5ac58307437
     }
 
   return (
