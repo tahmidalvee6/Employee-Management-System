@@ -2,13 +2,14 @@ import { Inngest } from "inngest";
 import Attendance from "../models/Attendance.js";
 import Employee from "../models/Employee.js";
 import LeaveApplication from "../models/LeaveApplication.js";
+import sentEmail from "../config/nodemailer.js";
 
 // Create a client to send and receive events
 export const inngest = new Inngest({ id: "fullstack-ems" });
 
 // Auto checkout for employees
 const autoCheckOut = inngest.createFunction(
-  { id: "auto-check-out" ,triggers:[{ event: "employee/check-out" }] },
+  { id: "auto-check-out", triggers: [{ event: "employee/check-out" }] },
   async ({ event, step }) => {
     const { employeeId, attendanceId } = event.data;
     // wait for 9 hours
@@ -24,7 +25,20 @@ const autoCheckOut = inngest.createFunction(
       //get employee data
       const employee = await Employee.findById(employeeId);
       // send reminder email
-
+      await sentEmail({
+        to: employee.email,
+        subject: "Attendence check-out Remainder",
+        body: `  <div style="max-width: 600px;">
+    <h2>Hi ${employee.firstName}, 👋</h2>
+    <p style="font-size: 16px;">You have a check-in in ${employee.department} today:</p>
+    <p style="font-size: 18px; font-weight: bold; color: #007bff; margin: 8px 0;">${attendance?.checkIn?.toLocaleTimeString()}</p>
+    <p style="font-size: 16px;">Please make sure to check-out in one hour.</p>
+    <p style="font-size: 16px;">If you have any questions, please contact your admin.</p>
+    <br />
+    <p style="font-size: 16px;">Best Regards,</p>
+    <p style="font-size: 16px;">EMS</p>
+  </div>`,
+      });
       //after 10 hours, mark attendance as checked out with status " late"
       await step.sleepUntil(
         ("wait-for-the-1-hours",
@@ -44,8 +58,8 @@ const autoCheckOut = inngest.createFunction(
 
 // send leaveApplicationReminder  ro admin
 const leaveApplicationReminder = inngest.createFunction(
-  { id: "aleave-application-reminder",triggers:[{ event: "leave/pending"}] },
-  
+  { id: "aleave-application-reminder", triggers: [{ event: "leave/pending" }] },
+
   async ({ event, step }) => {
     const { leaveApplicationId } = event.data;
     // wait for 24 hours
@@ -60,6 +74,20 @@ const leaveApplicationReminder = inngest.createFunction(
     if (leaveApplication?.status === "PENDING") {
       const employee = await Employee.findById(leaveApplication.employeeId);
       // send reminder email to admin to take action on leave application.
+      await sentEmail({
+        to:process.env.ADMIN_EMAIL,
+        subject:`Leave Application Reminder`,
+        body:`<div style="max-width: 600px;">
+<h2>Hi Admin, 👋</h2>
+<p style="font-size: 16px;">You have a leave application in ${employee.department} today:</p>
+<p style="font-size: 18px; font-weight: bold; color: #007bff; margin: 8px 0;">${leaveApplication?.startDate?.toLocaleDateString()}</p>
+<p style="font-size: 16px;">Please make sure to take action on this leave application.</p>
+<br />
+<p style="font-size: 16px;">Best Regards,</p>
+<p style="font-size: 16px;">EMS</p>
+</div>
+        `
+      })
     }
   },
 );
@@ -67,7 +95,7 @@ const leaveApplicationReminder = inngest.createFunction(
 // cron: check attendance at 11:30 AM IST(06:00 UTC) and email absent employees.
 
 const attendanceReminderCron = inggest.createFunction(
-  { id: "attendance-reminder-cron",triggers:[{ cron: " 0 0 6 * * *" }] },
+  { id: "attendance-reminder-cron", triggers: [{ cron: " 0 0 6 * * *" }] },
   async ({ step }) => {
     const step = await step.run("get-today-date", () => {
       const starUTC = new Date(
@@ -120,6 +148,11 @@ const attendanceReminderCron = inggest.createFunction(
       await step.run("send-reminder-emails", async () => {
         const emailPromises = absentEmployees.map((emp) => {
           // send email
+          sentEmail({
+            to:emp.email,
+            subject:'Attenance Reminder - Please Mark your Attendance',
+            body:``
+          })
         });
       });
     }
