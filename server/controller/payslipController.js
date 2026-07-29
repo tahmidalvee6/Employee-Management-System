@@ -3,16 +3,16 @@ import Payslip from "../models/Payslip.js";
 
 
 // Create Payslip
-// POST /api/payslip
+// POST /api/payslips
 
-export const createPayslip = async (requestAnimationFrame, res) => {
+export const createPayslip = async (req, res) => {
     try {
         const { employeeId, month, year, basicSalary, allowances, deductions } = req.body;
 
-        if(!employeeId || !month || !year || !basicSalary){
+        if (!employeeId || !month || !year || !basicSalary) {
             return res.status(400).json({ error: "Missing fields" });
         }
-        
+
         const netSalary = Number(basicSalary) + Number(allowances || 0) - Number(deductions || 0);
 
         const payslip = await Payslip.create({
@@ -23,13 +23,12 @@ export const createPayslip = async (requestAnimationFrame, res) => {
             allowances: Number(allowances || 0),
             deductions: Number(deductions || 0),
             netSalary,
-
         })
 
-        return res.json({sucess: true, data: payslip})
+        return res.json({ success: true, data: payslip })
 
     } catch (error) {
-        return res.status(500).json({error: "Failed"});
+        return res.status(500).json({ error: "Failed" });
     }
 }
 
@@ -62,17 +61,17 @@ export const getPayslips = async (req, res) => {
     } catch (error) {
         return res.status(500).json({ error: "Failed" });
     }
- }
+}
 
 
 // Get Payslip by ID
-// GET /api/payslip/:id
+// GET /api/payslips/:id
 
-export const getPayslipById = async (requestAnimationFrame, res) => {
+export const getPayslipById = async (req, res) => {
     try {
         const payslip = await Payslip.findById(req.params.id).populate("employeeId").lean();
 
-        if(!payslip) return res.status(404).json({ error: "Not found" });
+        if (!payslip) return res.status(404).json({ error: "Not found" });
 
         const result = {
             ...payslip,
@@ -80,9 +79,7 @@ export const getPayslipById = async (requestAnimationFrame, res) => {
             employee: payslip.employeeId,
         }
         return res.json(result)
-    } catch(error) {
-        return res.status(500).json({error: "Failed"});
+    } catch (error) {
+        return res.status(500).json({ error: "Failed" });
     }
 }
-
-
