@@ -33,13 +33,13 @@ export const createPayslip = async (req, res) => {
 }
 
 
-// Get Payslip(s)
-// GET /api/payslips
+// Get Payslips 
+// GET /api/payslip
 
-export const getPayslip = async (req, res) => {
+export const getPayslips = async (req, res) => {
     try {
-        const isAdmin = req.user?.role === "ADMIN";
-
+        const session = req.session;
+        const isAdmin = session.role == "ADMIN";
         if (isAdmin) {
             const payslips = await Payslip.find().populate("employeeId").sort({ createdAt: -1 });
             const data = payslips.map((p) => {
@@ -49,14 +49,14 @@ export const getPayslip = async (req, res) => {
                     id: obj._id.toString(),
                     employee: obj.employeeId,
                     employeeId: obj.employeeId?._id?.toString(),
-                }
-            })
+                };
+            });
             return res.json({ data });
         } else {
-            const employee = await Employee.findOne({ userId: req.user?.userId })
+            const employee = await Employee.findOne({ userId: session.userId });
             if (!employee) return res.status(404).json({ error: "Not found" });
             const payslips = await Payslip.find({ employeeId: employee._id }).sort({ createdAt: -1 });
-            return res.json({ data: payslips })
+            return res.json({ data: payslips });
         }
     } catch (error) {
         return res.status(500).json({ error: "Failed" });

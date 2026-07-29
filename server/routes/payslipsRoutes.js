@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { protect, protectAdmin } from "../middleware/auth.js";
-import { createPayslip, getPayslipById, getPayslip } from "../controller/payslipController.js";
+import { createPayslip, getPayslipById, getPayslips } from "../controller/payslipController.js";
 
 const payslipRouter = Router();
 
