@@ -6,6 +6,7 @@ import ProfileForm from "../components/ProfileForm"
 import ChangePasswordModal from "../components/ChangePasswordModal"
 import { useAuth } from "../context/AuthContext"
 import api from "../api/axios"
+import toast from 'react-hot-toast'
 
 const Settings = () => {
 
@@ -20,7 +21,7 @@ const Settings = () => {
             const profile = res.data;
             if(profile) setProfile(profile)
         } catch (error) {
-            toast.error(err?.response?.data?.error || err?.message)
+            toast.error(error.response?.data?.error || error.message)
         } finally {
             setLoading(false)
         }

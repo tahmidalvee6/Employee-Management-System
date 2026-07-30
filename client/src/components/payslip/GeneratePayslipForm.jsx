@@ -5,9 +5,8 @@ import { dummyEmployeeData } from '../../assets/assets'
 import api from '../../api/axios'
 import toast from 'react-hot-toast'
 
-const GeneratePayslipForm = () => {
+const GeneratePayslipForm = ({ employees, onSuccess }) => {
 
-    const employees = dummyEmployeeData
     const [isOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
 
@@ -16,6 +15,10 @@ const GeneratePayslipForm = () => {
             <Plus className="w-4 h-4" /> Generate Payslip
         </button>
     )
+
+    if (!employees || employees.length === 0) {
+        return <p className="text-slate-500 text-sm">No employees available to generate payslip.</p>
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -26,8 +29,8 @@ const GeneratePayslipForm = () => {
             await api.post('/payslips', data)
             setIsOpen(false)
             onSuccess()
-        } catch (err) {
-            toast.error(err.response?.data?.error || err?.message);
+        } catch (error) {
+            toast.error(error.response?.data?.error || error.message);
         }
         setLoading(false)
     }
