@@ -4,6 +4,7 @@ import LoginLeftSide from "./LoginLeftSide"
 import { ArrowLeftIcon, EyeIcon, EyeOffIcon, Loader2Icon } from "lucide-react"
 import { useAuth } from "../context/AuthContext"
 import toast from "react-hot-toast"
+import { FaGithub, FaGoogle } from "react-icons/fa"
 
 const LoginForm = ({ role, title, subtitle }) => {
 
@@ -12,7 +13,7 @@ const LoginForm = ({ role, title, subtitle }) => {
     const [showPassword, setShowPassword] = useState(false)
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
-    const { login } = useAuth()
+    const { login, loginWithProvider } = useAuth()
     const navigate = useNavigate()
 
     const handleSubmit = async (e) => {
@@ -21,6 +22,19 @@ const LoginForm = ({ role, title, subtitle }) => {
         setLoading(true)
         try {
             await login(email, password, role)
+            navigate("/dashboard")
+        } catch (error) {
+            toast.error(error.response?.data?.error || error.message || "Login failed")
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleProviderLogin = async (provider) => {
+        setError("")
+        setLoading(true)
+        try {
+            await loginWithProvider(provider, role)
             navigate("/dashboard")
         } catch (error) {
             toast.error(error.response?.data?.error || error.message || "Login failed")
@@ -76,6 +90,33 @@ const LoginForm = ({ role, title, subtitle }) => {
                             {loading && <Loader2Icon className="animate-spin h-4 w-4 mr-2" />}
                             Sign in
                         </button>
+
+                        <div className="flex items-center gap-3">
+                            <div className="h-px flex-1 bg-slate-200" />
+                            <span className="text-xs uppercase text-slate-400">or continue with</span>
+                            <div className="h-px flex-1 bg-slate-200" />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                type="button"
+                                onClick={() => handleProviderLogin("google")}
+                                disabled={loading}
+                                className="flex items-center justify-center gap-2 rounded-lg border border-slate-200 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                            >
+                                <FaGoogle className="text-red-500" />
+                                Google
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => handleProviderLogin("github")}
+                                disabled={loading}
+                                className="flex items-center justify-center gap-2 rounded-lg border border-slate-200 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                            >
+                                <FaGithub className="text-slate-800" />
+                                GitHub
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
