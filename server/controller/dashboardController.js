@@ -3,10 +3,10 @@ import Employee from "../models/Employee.js";
 import Attendance from "../models/Attendance.js";
 import LeaveApplication from "../models/LeaveApplication.js";
 import Payslip from "../models/Payslip.js";
-export const getDashboard = async (requestAnimationFrame, res) => {
+export const getDashboard = async (req, res) => {
   try {
-    const session = req.session;
-    if (session.role === "Admin") {
+    const session = req.user;
+    if (session.role === "ADMIN") {
       const [totalEmployees, todayAttendance, pendingLeaves] =
         await Promise.all([
           Employee.countDocuments({ isDeleted: { $ne: true } }),
@@ -27,7 +27,7 @@ export const getDashboard = async (requestAnimationFrame, res) => {
       });
     } else {
       const employee = await Employee.findOne({
-        userid: session.userId,
+        userId: session.userId,
       }).lean();
       if (!employee)
         return res.status(404).json({ error: "Employee not found" });
@@ -46,7 +46,7 @@ export const getDashboard = async (requestAnimationFrame, res) => {
             employeeId: employee._id,
             status: "PENDING",
           }),
-          payslip
+          Payslip
             .findOne({ employeeId: employee._id })
             .sort({
               createdAt: -1,

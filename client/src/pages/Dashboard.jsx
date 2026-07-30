@@ -11,8 +11,8 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        api.get('/dashboard').then(()=>setData(res.data)).catch((err)=>
-        toast.error(err.response?.data?.error || err?.message)).finally(()=>
+        api.get('/dashboard').then((res)=>setData(res.data)).catch((error)=>
+        toast.error(error.response?.data?.error || error?.message)).finally(()=>
         setLoading(false))
     }, [])
 

@@ -25,7 +25,7 @@ const EmployeeForm = ({ initialData, onSuccess, onCancel }) => {
             await api[method](url, formData)
             onSuccess ? onSuccess() : navigate("/employees")
         } catch(error) {
-            toast.error(err.response?.data?.error || err.message);
+            toast.error(error.response?.data?.error || error.message);
         } finally {
             setLoading(false);
         }
@@ -73,7 +73,7 @@ const EmployeeForm = ({ initialData, onSuccess, onCancel }) => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-sm text-slate-700">
                     <div>
                         <label className="block mb-2">Department</label>
-                        <select name="department" defaultValue={initialData?.department || " "}>
+                        <select name="department" defaultValue={initialData?.department || ""}>
                             <option value=""> Select Department </option>
                             {DEPARTMENTS.map((deptName) => (
                                 <option key={deptName} value={deptName}>
@@ -92,16 +92,16 @@ const EmployeeForm = ({ initialData, onSuccess, onCancel }) => {
                     </div>
                     <div>
                         <label className="block mb-2"> Allowances </label>
-                        <input type="number" name="allowances" min="0" step="0.01" required defaultValue={initialData?.allowances || 0} />
+                        <input type="number" name="allowance" min="0" step="0.01" required defaultValue={initialData?.allowances || 0} />
                     </div>
                     <div>
                         <label className="block mb-2"> Deductions </label>
-                        <input type="number" name="deductions" min="0" step="0.01" required defaultValue={initialData?.deductions || 0} />
+                        <input type="number" name="deduction" min="0" step="0.01" required defaultValue={initialData?.deductions || 0} />
                     </div>
                     {isEditMode && (
                         <div>
                             <label className="block mb-2"> Status </label>
-                            <select name="employmentStatus" defaultValue={initialData?.employmentStatus} >
+                            <select name="employeeStatus" defaultValue={initialData?.employeeStatus || "ACTIVE"} >
                                 <option value="ACTIVE"> Active</option>
                                 <option value="INACTIVE">Inactive</option>
                             </select>
