@@ -13,11 +13,15 @@ const Employees = () => {
     const [showCreateModal, setShowCreateModal] = useState(false)
 
     const fetchEmployees = useCallback(async () => {
-        setLoading(true)
-        setEmployees(dummyEmployeeData.filter((emp) => (selectedDept ? emp.department === selectedDept : emp)))
-        setTimeout(() => {
+        try {
+            const url = selectDept ? `/employees?department=${selectedDept}` : "/employees";
+            const res = await api.get(url)
+            setEmployees(res.data)
+        } catch (error) {
+            console.error("Failed to fetch employees");
+        } finally {
             setLoading(false)
-        }, 1000)
+        }
     }, [selectedDept])
 
     useEffect(() => {
