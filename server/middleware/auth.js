@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken';
 
-
 export const protect = (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
@@ -16,8 +15,8 @@ export const protect = (req, res, next) => {
         req.user = session;
         next();
     } catch (error) {
-        return res.status(401).json({ error: "Unauthorized access" }); 
-    }     
+        return res.status(401).json({ error: "Unauthorized access" });
+    }
 }
 
 
