@@ -1,9 +1,6 @@
 import { Loader2, Save, User } from 'lucide-react';
 import React, { useState } from 'react'
-<<<<<<< HEAD
 import api from '../api/axios';
-=======
->>>>>>> ca03ae14e9570d22225491143a38c5ac58307437
 
 const ProfileForm = ({initialData, onSuccess}) => {
 
@@ -13,7 +10,6 @@ const ProfileForm = ({initialData, onSuccess}) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-<<<<<<< HEAD
         setLoading(true)
         setError("")
         setMessage("")
@@ -27,8 +23,6 @@ const ProfileForm = ({initialData, onSuccess}) => {
         } finally {
             setLoading(false)
         }
-=======
->>>>>>> ca03ae14e9570d22225491143a38c5ac58307437
     }
 
   return (

@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
 import { X, FileText, CalendarDays, Loader2, Send } from "lucide-react";
 import api from '../../api/axios';
 import toast from 'react-hot-toast';
+import { useState } from "react";
 
 const ApplyLeaveModal = ({open, onClose, onSuccess}) => {
   
