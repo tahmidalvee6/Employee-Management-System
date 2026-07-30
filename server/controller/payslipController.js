@@ -38,7 +38,7 @@ export const createPayslip = async (req, res) => {
 
 export const getPayslips = async (req, res) => {
     try {
-        const session = req.session;
+        const session = req.user;
         const isAdmin = session.role == "ADMIN";
         if (isAdmin) {
             const payslips = await Payslip.find().populate("employeeId").sort({ createdAt: -1 });

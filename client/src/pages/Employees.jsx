@@ -3,6 +3,7 @@ import { dummyEmployeeData, DEPARTMENTS } from "../assets/assets.jsx"
 import { Plus, Search, XIcon } from "lucide-react"
 import EmployeeCard from "../components/EmployeeCard"
 import EmployeeForm from "../components/EmployeeForm"
+import api from "../api/axios"
 
 const Employees = () => {
     const [employees, setEmployees] = useState([])
@@ -14,7 +15,7 @@ const Employees = () => {
 
     const fetchEmployees = useCallback(async () => {
         try {
-            const url = selectDept ? `/employees?department=${selectedDept}` : "/employees";
+            const url = selectedDept ? `/employees?department=${selectedDept}` : "/employees";
             const res = await api.get(url)
             setEmployees(res.data)
         } catch (error) {

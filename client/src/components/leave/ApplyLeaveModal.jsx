@@ -23,7 +23,7 @@ const ApplyLeaveModal = ({open, onClose, onSuccess}) => {
             onSuccess();
             onClose();
         } catch (error) {
-            toast.error(err.response?.data?.error || err?.message)
+            toast.error(error.response?.data?.error || error?.message)
         }
     }
 

@@ -8,7 +8,7 @@ import User from "../models/User.js";
 export const getEmployees = async (req, res) => {
     try {
         const { department, status } = req.query;
-        const where = {};
+        const where = { isDeleted: false };
         if (department) where.department = department;
 
         const employees = await Employee.find(where).sort({ createdAt: -1 }).populate("userId", "email role").lean();
@@ -43,30 +43,39 @@ export const createEmployee = async (req, res) => {
         const hashed = await bcrypt.hash(password, 10);
         const newUser = await User.create({ email, password: hashed, role : role|| 'EMPLOYEE'  });
 
-        const employee = await Employee.create({
-            userId: newUser._id,
-            firstName,
-            lastName,
-            email,
-            phone,
-            position,
-            department : department || "Engineering",
-            basicSalary : Number(basicSalary) || 0,
-            allowances : Number(allowance) || 0,
-            deductions : Number(deduction) || 0,
-            joinDate :  new Date(joinDate),
-            bio : bio || ""
-        });
-            
-        return res.status(201).json({ success: true, employee });
+        try {
+            const employee = await Employee.create({
+                userId: newUser._id,
+                firstName,
+                lastName,
+                email,
+                phone,
+                position,
+                department : department || "Operations",
+                basicSalary : Number(basicSalary) || 0,
+                allowances : Number(allowance) || 0,
+                deductions : Number(deduction) || 0,
+                joinDate :  new Date(joinDate),
+                bio : bio || ""
+            });
+                
+            return res.status(201).json({ success: true, employee });
+        } catch (employeeError) {
+            await User.findByIdAndDelete(newUser._id);
+            console.error("Error creating employee after user creation:", employeeError);
+            if (employeeError.name === "ValidationError") {
+                return res.status(400).json({ error: `Invalid employee data: ${Object.values(employeeError.errors).map(e => e.message).join(", ")}` });
+            }
+            return res.status(500).json({ error: "Failed to create employee. User rollback successful." });
+        }
 
 
     } catch (error) {
        if (error.code === 11000) {
             return res.status(400).json({ error: "Email already exists" });
-        }
-        console.error("Error creating employee:", error);
-        return res.status(500).json({ error: "Failed to create employee" });
+       }
+       console.error("Error creating employee:", error);
+       return res.status(500).json({ error: "Failed to create employee" });
     }
 };
 
@@ -92,7 +101,7 @@ export const updateEmployee = async (req, res) => {
             email,
             phone,
             position,
-            department : department || "Engineering",
+            department : department || "Operations",
             basicSalary : Number(basicSalary) || 0,
             allowances : Number(allowance) || 0,
             deductions : Number(deduction) || 0,
@@ -126,15 +135,15 @@ export const updateEmployee = async (req, res) => {
 export const deleteEmployee = async (req, res) => {
     try {
         const { id } = req.params;
-        const employee = await Employee.findById(id);
+        const employee = await Employee.findByIdAndDelete(id);
+
         if (!employee) {
             return res.status(404).json({ error: "Employee not found" });
         }
-    employee.isDeleted = true;
-    employee.employeeStatus = "INACTIVE";
-    await employee.save();
 
-    return res.json({ success: true, message: "Employee deleted successfully" });
+        await User.findByIdAndDelete(employee.userId);
+
+        return res.json({ success: true, message: "Employee deleted successfully" });
     } catch (error) {
         return res.status(500).json({ error: "Failed to delete employee" });
     }
