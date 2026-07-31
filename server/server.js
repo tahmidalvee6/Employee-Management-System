@@ -1,6 +1,5 @@
 import dns from "node:dns";
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
-
 import express from "express";
 import cors from "cors";
 import "dotenv/config";
@@ -20,10 +19,27 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 // Middleware
+const allowedOrigins = [
+  "https://employee-management-system-ems-seven.vercel.app",
+  "https://employee-management-system-alvee6.vercel.app",
+  "https://employee-management-system-theta-inky.vercel.app",
+  "http://localhost:5173"
+];
+
 app.use(cors({
-  origin: "https://employee-management-system-ems-seven.vercel.app",
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    if (/^https:\/\/employee-management-system.*\.vercel\.app$/.test(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error("Not allowed by CORS"));
+  },
   credentials: true
 }));
+
 app.use(express.json());
 app.use(multer().none())
 
@@ -39,5 +55,4 @@ app.use("/api/dashboard", dashboardRouter);
 app.use("/api/inngest", serve({ client: inngest, functions }));
 
 await connectDB();
-
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
