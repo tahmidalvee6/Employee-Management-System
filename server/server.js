@@ -1,7 +1,5 @@
 import dns from "node:dns";
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
-
-
 import express from "express";
 import cors from "cors";
 import "dotenv/config";
@@ -14,20 +12,36 @@ import profileRouter from "./routes/profileRoutes.js";
 import leaveRouter from "./routes/leaveRoutes.js";
 import payslipRouter from "./routes/payslipsRoutes.js";
 import dashboardRouter from "./routes/dashboardRoutes.js";
-
-
 import { serve } from "inngest/express";
 import { inngest, functions } from "./inngest/index.js"
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-
 // Middleware
-app.use(cors());
+const allowedOrigins = [
+  "https://employee-management-system-ems-seven.vercel.app",
+  "https://employee-management-system-alvee6.vercel.app",
+  "https://employee-management-system-theta-inky.vercel.app",
+  "http://localhost:5173"
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    if (/^https:\/\/employee-management-system.*\.vercel\.app$/.test(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true
+}));
+
 app.use(express.json());
 app.use(multer().none())
-
 
 // Routes
 app.get("/", (req, res) =>res.send("Server is running..."));
@@ -38,7 +52,6 @@ app.use("/api/attendance", attendanceRouter);
 app.use("/api/leave", leaveRouter);
 app.use("/api/payslips", payslipRouter);
 app.use("/api/dashboard", dashboardRouter);
-
 app.use("/api/inngest", serve({ client: inngest, functions }));
 
 await connectDB();
