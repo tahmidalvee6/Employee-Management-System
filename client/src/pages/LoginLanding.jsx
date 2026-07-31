@@ -13,7 +13,7 @@ const LoginLanding = () => {
         {
             to: "/login/admin",
             title: "Admin Portal",
-            desciption: "Manage employees, departments, payroll, and system configuration.",
+            desciption: "",
             icon: ShieldIcon,
             color: "from-indigo-500 to-purple-600",
             iconBg: "bg-indigo-100 text-indigo-600",
@@ -21,7 +21,7 @@ const LoginLanding = () => {
         {
             to: "/login/employee",
             title: "Employee Portal",
-            desciption: "View your profile, track attendance, request time off, and access payslips.",
+            desciption: "",
             icon: UserIcon,
             color: "from-emerald-500 to-teal-600",
             iconBg: "bg-emerald-100 text-emerald-600",
