@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react"
-import { dummyAdminDashboardData, dummyEmployeeDashboardData } from "../assets/assets.jsx"
-import Loading from "../components/Loading"
-import EmployeeDashboard from "../components/EmployeeDashboard"
-import AdminDashboard from "../components/AdminDashboard"
-import api from "../api/axios.js"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
+import StatCard from "../components/StatCard"
+import api from "../api/axios"
 import toast from "react-hot-toast"
 
 const Dashboard = () => {
@@ -16,14 +14,19 @@ const Dashboard = () => {
         setLoading(false))
     }, [])
 
-    if (loading) return <Loading />
-    if (!data) return <p className="text-center text-slate-500 py-12">Failed to load Dashboard</p>
+    if (loading) return <div>Loading...</div>
 
-    if (data.role === "ADMIN") {
-        return <AdminDashboard data={data}/>
-    } else {
-        return <EmployeeDashboard data={data}/>
-    }
+    return (
+        <div className="p-8">
+            <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <StatCard title="Total Employees" value={data?.totalEmployees || 0} />
+                <StatCard title="Today Attendance" value={data?.todayAttendance || 0} />
+                <StatCard title="Pending Leaves" value={data?.pendingLeaves || 0} />
+                <StatCard title="Total Payslips" value={data?.totalPayslips || 0} />
+            </div>
+        </div>
+    )
 }
 
 export default Dashboard

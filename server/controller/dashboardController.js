@@ -1,4 +1,3 @@
-import { DEPARTMENTS } from "../constants/departments.js";
 import Employee from "../models/Employee.js";
 import Attendance from "../models/Attendance.js";
 import LeaveApplication from "../models/LeaveApplication.js";
@@ -11,19 +10,17 @@ export const getDashboard = async (req, res) => {
         await Promise.all([
           Employee.countDocuments({ isDeleted: { $ne: true } }),
           Attendance.countDocuments({
-            date: {
-              $gte: new Date(new Date().setHours(0, 0, 0, 0)),
-              $lt: new Date(new Date().setHours(24, 0, 0, 0)),
-            },
+            date: new Date().toISOString().split("T")[0],
           }),
           LeaveApplication.countDocuments({ status: "PENDING" }),
         ]);
+      const payslips = await Payslip.find({}).sort({ createdAt: -1 }).limit(10);
+
       return res.json({
-        role: "ADMIN",
         totalEmployees,
-        totalDepartments: DEPARTMENTS.length,
         todayAttendance,
         pendingLeaves,
+        totalPayslips: payslips.length,
       });
     } else {
       const employee = await Employee.findOne({
@@ -32,17 +29,12 @@ export const getDashboard = async (req, res) => {
       if (!employee)
         return res.status(404).json({ error: "Employee not found" });
 
-      const today = new Date();
-      const [currentMonthAttendance, pendingLeaves, lastestPayslip] =
-        await Promise.all([
-          Attendance.countDocuments({
-            employeeId: employee._id,
-            date: {
-              $gte: new Date(today.getFullYear(), today.getMonth(), 1),
-              $lt: new Date(today.getFullYear(), today.getMonth(), +1, 1),
-            },
-          }),
-          LeaveApplication.countDocuments({
+      const [todayAttendance, leaves, payslip] = await Promise.all([
+        Attendance.findOne({
+          employeeId: employee._id,
+          date: new Date().toISOString().split("T")[0],
+        }),
+        LeaveApplication.countDocuments({
             employeeId: employee._id,
             status: "PENDING",
           }),
@@ -50,21 +42,17 @@ export const getDashboard = async (req, res) => {
             .findOne({ employeeId: employee._id })
             .sort({
               createdAt: -1,
-            })
-            .lean(),
+            }),
         ]);
+
       return res.json({
-        role: "EMPLOYEE",
-        employee: { ...employee, id: employee._id.toString() },
-        currentMonthAttendance,
-        pendingLeaves,
-        lastestPayslip: lastestPayslip
-          ? { ...lastestPayslip, id: lastestPayslip._id.toString() }
-          : null,
+        totalEmployees: 1,
+        todayAttendance: todayAttendance ? 1 : 0,
+        pendingLeaves: leaves,
+        totalPayslips: payslip ? 1 : 0,
       });
     }
   } catch (error) {
-    console.error("Dashboard error:", error);
-    return res.status(500).json({ error: "Failed" });
+    return res.status(500).json({ error: error.message });
   }
 };

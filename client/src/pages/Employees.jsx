@@ -7,11 +7,11 @@ import api from "../api/axios"
 
 const Employees = () => {
     const [employees, setEmployees] = useState([])
-    const [loading, setLoading] = useState(true)
-    const [search, setSearch] = useState("");
-    const [selectedDept, setSelectedDept] = useState("")
-    const [editEmployee, setEditEmployee] = useState(null)
-    const [showCreateModal, setShowCreateModal] = useState(false)
+    const [filteredEmployees, setFilteredEmployees] = useState([])
+    const [selectedDept, setSelectedDept] = useState('')
+    const [searchTerm, setSearchTerm] = useState('')
+    const [showForm, setShowForm] = useState(false)
+    const [selectedEmployee, setSelectedEmployee] = useState(null)
 
     const fetchEmployees = useCallback(async () => {
         try {
@@ -19,124 +19,87 @@ const Employees = () => {
             const res = await api.get(url)
             setEmployees(res.data)
         } catch (error) {
-            console.error("Failed to fetch employees");
-        } finally {
-            setLoading(false)
+            console.error("Error fetching employees:", error);
         }
     }, [selectedDept])
 
     useEffect(() => {
-        fetchEmployees();
+        fetchEmployees()
     }, [fetchEmployees])
 
-    const filtered = employees.filter((emp) =>
-        `${emp.firstName} ${emp.lastName} ${emp.position}`.toLowerCase().includes(search.toLowerCase())
-    )
+    useEffect(() => {
+        const filtered = employees.filter(emp =>
+            emp.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            emp.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            emp.email.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        setFilteredEmployees(filtered)
+    }, [employees, searchTerm])
 
     return (
-        <div className="animate-fade-in">
-            {/*....header....*/}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-                <div>
-                    <h1 className="page-title">Employees</h1>
-                    <p className="page-subtitle"> Manage your team members </p>
-                </div>
-                <button onClick={() => setShowCreateModal(true)} className="btn-primary flex items-center gap-2 w-full sm:w-auto justify-center">
-                    <Plus size={16} /> Add Employee
+        <div className="p-8">
+            <div className="flex justify-between items-center mb-8">
+                <h1 className="text-3xl font-bold">Employees</h1>
+                <button
+                    onClick={() => { setShowForm(true); setSelectedEmployee(null) }}
+                    className="flex gap-2 items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                    <Plus size={20} />
+                    Add Employee
                 </button>
             </div>
 
-            {/*.....search....*/}
-            <div className="flex flex-col sm:flex-row gap-3 mb-6">
-                <div className="relative flex-1">
-                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-                    <input placeholder=" Search employees..." className="w-full pl-10!" onChange={(e) => setSearch(e.target.value)} value={search} />
+            <div className="mb-6 flex gap-4 flex-wrap">
+                <div className="flex-1 min-w-64">
+                    <div className="relative">
+                        <Search className="absolute left-3 top-3 text-slate-400" size={20} />
+                        <input
+                            type="text"
+                            placeholder="Search by name or email..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
                 </div>
-                <select value={selectedDept} onChange={(e) => setSelectedDept(e.target.value)} className="max-w-40">
+                <select
+                    value={selectedDept}
+                    onChange={(e) => setSelectedDept(e.target.value)}
+                    className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
                     <option value="">All Departments</option>
-                    {DEPARTMENTS.map((deptName) => (
-                        <option key={deptName} value={deptName}>{deptName}</option>
+                    {DEPARTMENTS.map(dept => (
+                        <option key={dept} value={dept}>{dept}</option>
                     ))}
                 </select>
+                {selectedDept && (
+                    <button
+                        onClick={() => setSelectedDept('')}
+                        className="px-4 py-2 bg-slate-300 text-slate-700 rounded-lg hover:bg-slate-400 flex gap-2 items-center"
+                    >
+                        <XIcon size={18} />
+                        Clear
+                    </button>
+                )}
             </div>
 
-            {/*.....employee cards......*/}
-            {loading ? (
-                <div className="flex justify-center p-12">
-                    <div className="animate-spin h-8 w-8 border-2 border-indigo-600 border-t-transparent rounded-full" />
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
-                    {filtered.length === 0 ? (
-                        <p className="col-span-full text-center py-16 text-slate-400 bg-white rounded-2xl border border-dashed border-slate-200">
-                            No employees found
-                        </p>
-                    ) : (
-                        filtered.map((emp) => (
-                            <EmployeeCard key={emp.id} employee={emp} onDelete={fetchEmployees} onEdit={(e) => setEditEmployee(e)} />
-                        ))
-                    )}
-                </div>
-            )}
-
-            {/* Create Employee Modal */}
-            {showCreateModal && (
-                <div
-                    className="fixed bg-black/40 backdrop-blur-sm inset-0 z-50 flex items-start justify-center p-4 overflow-y-auto"
-                    onClick={() => setShowCreateModal(false)}
-                >
-                    <div
-                        className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl my-8 animate-fade-in"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div className="flex items-center justify-between p-6 pb-0">
-                            <div>
-                                <h2>Add New Employee</h2>
-                                <p>Create a user account and employee profile</p>
-                            </div>
-                            <button
-                                onClick={() => setShowCreateModal(false)}
-                                className="p-2 rounded-lg hover:bg-slate-100 transition-colors text-slate-400 hover:text-slate-600"
-                            >
-                                <XIcon className="w-5 h-5" />
-                            </button>
-                        </div>
-                        <div className="p-6">
-                            <EmployeeForm 
-                             onSuccess={()=> {
-                                setShowCreateModal(false);
-                                fetchEmployees();
-                             }} onCancel={()=> setShowCreateModal(false)} /> 
-                        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredEmployees.map(employee => (
+                    <div key={employee.id} onClick={() => { setSelectedEmployee(employee); setShowForm(true) }} className="cursor-pointer">
+                        <EmployeeCard employee={employee} onDelete={fetchEmployees} onEdit={(emp) => { setSelectedEmployee(emp); setShowForm(true) }} />
                     </div>
-                </div>
-            )}
-            {/* Edit Employee Model */}
-            {editEmployee && (
-                <div className="fixed inset-0 z-50 flex items-start justify-center p-4 overflow-y-auto bg-black/40 backdrop-blur-sm" onClick={() => setEditEmployee(null)}>
-                    <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl my-8 animate-fade-in" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center justify-between p-6 pb-0">
-                            <div>
-                                <h2> Edit Employee</h2>
-                                <p> Update employee details </p>
-                            </div>
-                            <button
-                                onClick={() => setEditEmployee(null)}
-                                className="p-2 rounded-lg hover:bg-slate-100 transition-colors text-slate-400 hover:text-slate-600"
-                            >
-                                <XIcon className="w-5 h-5" />
-                            </button>
-                        </div>
-                        <div className="p-6">
-                             <EmployeeForm initialData={editEmployee}
-                             onSuccess={()=> {
-                                setEditEmployee(null);
-                                fetchEmployees();
-                             }} onCancel={()=> setEditEmployee(null)} /> 
-                        </div>
+                ))}
+            </div>
+
+            {showForm && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+                    <div className="bg-white rounded-lg max-h-96 overflow-y-auto w-full max-w-2xl">
+                        <EmployeeForm
+                            initialData={selectedEmployee}
+                            onSuccess={() => { fetchEmployees(); setShowForm(false) }}
+                            onCancel={() => { setShowForm(false); setSelectedEmployee(null) }}
+                        />
                     </div>
-
-
                 </div>
             )}
         </div>
