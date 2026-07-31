@@ -1,7 +1,5 @@
-import React, { useState }from 'react'
-import { Loader2, Plus } from 'lucide-react'
-import { X } from 'lucide-react'
-import { dummyEmployeeData } from '../../assets/assets'
+import { useState }from 'react'
+import { Loader2, Plus, X } from 'lucide-react'
 import api from '../../api/axios'
 import toast from 'react-hot-toast'
 

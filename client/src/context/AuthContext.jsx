@@ -1,8 +1,9 @@
 import { createContext, useState, useEffect, useContext } from "react";
+import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import api from "../api/axios";
+import { auth } from "../firebase";
 
 const AuthContext = createContext(null);
-
 
 
 export function AuthProvider({ children }) {
@@ -51,12 +52,21 @@ export function AuthProvider({ children }) {
         }
     }
 
-    const loginWithProvider = async (providerName, role_tpe) => {
+    const loginWithProvider = async (role_tpe) => {
+        if (!auth) {
+            throw new Error("Firebase is not configured. Please add your Firebase config values.");
+        }
+
         try {
+            const provider = new GoogleAuthProvider();
+            const firebaseUser = await signInWithPopup(auth, provider);
+            const firebaseToken = await firebaseUser.user.getIdToken();
+            const email = firebaseUser.user.email;
+
             const { data } = await api.post("/auth/login", {
-                email: providerName === "github" ? "github_user" : "google_user",
-                password: "",
-                role_type: role_tpe
+                email,
+                role_type: role_tpe,
+                firebaseToken,
             });
 
             localStorage.setItem("token", data.token);
