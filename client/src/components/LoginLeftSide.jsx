@@ -2,6 +2,7 @@
 
 const LoginLeftSide = () => {
     return (
+<<<<<<< HEAD
         <div className="hidden md:flex w-1/2 bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-950 border-slate-200 relative overflow-hidden">
             <div className="absolute -top-32 -left-32 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl animate-pulse-slow"></div>
             <div className="absolute -bottom-40 -right-32 w-72 h-72 bg-purple-500/15 rounded-full blur-3xl animate-pulse-slow delay-1000"></div>
@@ -21,9 +22,26 @@ const LoginLeftSide = () => {
                     Streamline your workforce operations, track attendance, manage payroll,
                     and empower your team with our comprehensive management solution.
                 </p>
+=======
+        <div className="hidden md:flex w-1/2 bg-indigo-950 border-slate-200">
+            <div className="absolute -top-32 -left-32 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl">
+
+            </div>
+
+            <div className="relative z-10 flex flex-col items-start justify-center p-12 lg:p-20 w-full h-full">
+                
+                <h1 className="text-4xl lg:text-5xl font-medium text-white mb-6 leading-tight tracking-tight">
+                    Employee <br /> Managment System
+                    <p className="text-slate-400 text-lg max-w-md leading-relaxed"> Streamline your workforce operation,track attendance, manage payroll, and empower your team securely.</p>
+                </h1>
+>>>>>>> dev
             </div>
         </div>
     )
 }
 
+<<<<<<< HEAD
 export default LoginLeftSide
+=======
+export default LoginLeftSide
+>>>>>>> dev

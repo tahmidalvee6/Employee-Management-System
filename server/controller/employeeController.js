@@ -40,7 +40,11 @@ export const createEmployee = async (req, res) => {
             return res.status(400).json({ error: "Missing required fields" });
         }
 
+<<<<<<< HEAD
         const hashed = password ? await bcrypt.hash(password, 10) : undefined;
+=======
+        const hashed = await bcrypt.hash(password, 10);
+>>>>>>> dev
         const newUser = await User.create({ email, password: hashed, role : role|| 'EMPLOYEE'  });
 
         try {

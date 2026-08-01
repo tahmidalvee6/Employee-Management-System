@@ -1,10 +1,17 @@
 import React, { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import LoginLeftSide from "./LoginLeftSide"
+<<<<<<< HEAD
 import { ArrowLeftIcon, EyeIcon, EyeOffIcon, Loader2Icon, MailIcon } from "lucide-react"
 import { useAuth } from "../context/AuthContext"
 import toast from "react-hot-toast"
 import { FaGoogle } from "react-icons/fa"
+=======
+import { ArrowLeftIcon, EyeIcon, EyeOffIcon, Loader2Icon } from "lucide-react"
+import { useAuth } from "../context/AuthContext"
+import toast from "react-hot-toast"
+import { FaGithub, FaGoogle } from "react-icons/fa"
+>>>>>>> dev
 
 const LoginForm = ({ role, title, subtitle }) => {
 
@@ -13,7 +20,10 @@ const LoginForm = ({ role, title, subtitle }) => {
     const [showPassword, setShowPassword] = useState(false)
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
+<<<<<<< HEAD
     const [googleLoading, setGoogleLoading] = useState(false)
+=======
+>>>>>>> dev
     const { login, loginWithProvider } = useAuth()
     const navigate = useNavigate()
 
@@ -25,12 +35,17 @@ const LoginForm = ({ role, title, subtitle }) => {
             await login(email, password, role)
             navigate("/dashboard")
         } catch (error) {
+<<<<<<< HEAD
             toast.error(error.message || "Login failed")
+=======
+            toast.error(error.response?.data?.error || error.message || "Login failed")
+>>>>>>> dev
         } finally {
             setLoading(false)
         }
     }
 
+<<<<<<< HEAD
     const handleGoogleLogin = async () => {
         setError("")
         setGoogleLoading(true)
@@ -46,14 +61,35 @@ const LoginForm = ({ role, title, subtitle }) => {
 
     const isEmployee = role === "employee"
 
+=======
+    const handleProviderLogin = async (provider) => {
+        setError("")
+        setLoading(true)
+        try {
+            await loginWithProvider(provider, role)
+            navigate("/dashboard")
+        } catch (error) {
+            toast.error(error.response?.data?.error || error.message || "Login failed")
+        } finally {
+            setLoading(false)
+        }
+    }
+>>>>>>> dev
     return (
         <div className="min-h-screen flex flex-col md:flex-row">
             <LoginLeftSide />
 
+<<<<<<< HEAD
             <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-gradient-to-br from-slate-50 via-white to-indigo-50">
                 <div className="w-full max-w-md animate-fade-in">
                     <Link to="/login" className="inline-flex items-center gap-2 text-slate-400 hover:text-slate-700 text-sm mb-10 transition-colors group">
                         <ArrowLeftIcon size={16} className="group-hover:-translate-x-1 transition-transform" />
+=======
+            <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-white">
+                <div className="w-full max-w-md animate-fade-in">
+                    <Link to="/login" className="inline-flex items-center gap-2 text-slate-400 hover:text-slate-700 text-sm mb-10 transition-colors">
+                        <ArrowLeftIcon size={16} />
+>>>>>>> dev
                         Back to portals
                     </Link>
                     <div className="mb-8">
@@ -70,6 +106,7 @@ const LoginForm = ({ role, title, subtitle }) => {
 
                     <form className="space-y-5" onSubmit={handleSubmit}>
                         <div>
+<<<<<<< HEAD
                             <label className="block text-sm font-medium text-slate-700 mb-2">Email address</label>
                             <div className="relative">
                                 <MailIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
@@ -146,10 +183,68 @@ const LoginForm = ({ role, title, subtitle }) => {
                     <div className="mt-8 text-center text-sm text-slate-400">
                         <p>&copy; {new Date().getFullYear()} Employee Management System. All rights reserved.</p>
                     </div>
+=======
+                            <label className="block text-sm font-medium text-slate-700 mb-2"> Email address</label>
+                            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                                required placeholder="jhon@email.com" />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2"> Password </label>
+                            <div className="relative">
+                                <input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)}
+                                    required className="pr-11" placeholder="**********" />
+                                <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors" onClick={() => setShowPassword(!showPassword)}>
+                                    {showPassword ? <EyeOffIcon size={18} />
+                                        : <EyeIcon size={18} />}
+                                </button>
+                            </div>
+                        </div>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors flex items-center justify-center disabled:opacity-50"
+                        >
+                            {loading && <Loader2Icon className="animate-spin h-4 w-4 mr-2" />}
+                            Sign in
+                        </button>
+
+                        <div className="flex items-center gap-3">
+                            <div className="h-px flex-1 bg-slate-200" />
+                            <span className="text-xs uppercase text-slate-400">or continue with</span>
+                            <div className="h-px flex-1 bg-slate-200" />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                type="button"
+                                onClick={() => handleProviderLogin("google")}
+                                disabled={loading}
+                                className="flex items-center justify-center gap-2 rounded-lg border border-slate-200 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                            >
+                                <FaGoogle className="text-red-500" />
+                                Google
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => handleProviderLogin("github")}
+                                disabled={loading}
+                                className="flex items-center justify-center gap-2 rounded-lg border border-slate-200 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                            >
+                                <FaGithub className="text-slate-800" />
+                                GitHub
+                            </button>
+                        </div>
+                    </form>
+>>>>>>> dev
                 </div>
             </div>
 
         </div>
     )
 }
+<<<<<<< HEAD
 export default LoginForm
+=======
+export default LoginForm
+>>>>>>> dev

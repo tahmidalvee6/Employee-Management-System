@@ -14,8 +14,15 @@ const EmployeeForm = ({ initialData, onSuccess, onCancel }) => {
         e.preventDefault()
         setLoading(true)
         const formData = new FormData(e.currentTarget);
+<<<<<<< HEAD
         const pwd = formData.get("password")
         if(!pwd) formData.delete("password")
+=======
+        if(isEditMode) {
+            const pwd = formData.get("password")
+            if(!pwd) formData.delete("password")
+        }
+>>>>>>> dev
 
         try {
             const url = isEditMode ? `/employees/${initialData.id}` : "/employees";
@@ -112,23 +119,39 @@ const EmployeeForm = ({ initialData, onSuccess, onCancel }) => {
                 <h3 className=" text-base font-medium  text-slate-900 mb-6 pb-4 border-b border-slate-100">
                     Account Setup
                 </h3>
+<<<<<<< HEAD
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-sm text-slate-700">
+=======
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-sm text-slate-700">
+>>>>>>> dev
                     <div className="sm:col-span-2">
                         <label className="block mb-2"> Work Email </label>
                         <input type="email" name="email" required defaultValue={initialData?.email} />
                     </div>
+<<<<<<< HEAD
+=======
+                    {!isEditMode && (
+                        <div >
+                            <label className="block mb-2"> Temporary Password </label>
+                            <input type="password" name="password" required />
+                        </div>
+                    )}
+>>>>>>> dev
                     {isEditMode && (
                         <div >
                             <label className="block mb-2"> Change Password(Optional) </label>
                             <input type="password" name="password" placeholder="Leave blank to keep current" />
                         </div>
                     )}
+<<<<<<< HEAD
             {!isEditMode && (
                         <div >
                             <label className="block mb-2"> Temporary Password </label>
                             <input type="password" name="password" required className="bg-slate-50" placeholder="Password employee will use to sign in" />
                         </div>
                     )}
+=======
+>>>>>>> dev
                     <div >
                         <label className="block mb-2"> System Role </label>
                         <select name="role" defaultValue={initialData?.user?.role || "EMPLOYEE"} >
