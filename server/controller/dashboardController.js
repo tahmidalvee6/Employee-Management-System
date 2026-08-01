@@ -33,7 +33,7 @@ export const getDashboard = async (req, res) => {
         return res.status(404).json({ error: "Employee not found" });
 
       const today = new Date();
-      const [currentMonthAttendance, pendingLeaves, lastestPayslip] =
+      const [currentMonthAttendance, pendingLeaves, latestPayslip] =
         await Promise.all([
           Attendance.countDocuments({
             employeeId: employee._id,
@@ -58,8 +58,8 @@ export const getDashboard = async (req, res) => {
         employee: { ...employee, id: employee._id.toString() },
         currentMonthAttendance,
         pendingLeaves,
-        lastestPayslip: lastestPayslip
-          ? { ...lastestPayslip, id: lastestPayslip._id.toString() }
+        latestPayslip: latestPayslip
+          ? { ...latestPayslip, id: latestPayslip._id.toString() }
           : null,
       });
     }
